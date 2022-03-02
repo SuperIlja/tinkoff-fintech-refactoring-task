@@ -28,30 +28,15 @@ class PizzaStore {
     }
 
     fun orderPizza(name: String): PizzaOrder {
-        val pizza = Pizza(name)
-        val ingredients = getIngredient(pizza)
+        val pizza = Pizza.getPizza(name) ?: error("Неизвестный вид пиццы!")
+        val ingredients = pizza.getIngredient()
         var pizzaPrice = 0.0
-        ingredients.forEach { ingredient ->
-            val ingredientName = ingredient.first
-            val ingredientCount = ingredient.second
+        ingredients.forEach {
+            val ingredientPrice = Ingredient.getIngredient(it.first)
+            val ingredientCount = it.second
 
-            val price = when (ingredientName) {
-                "яйца" -> 3.48
-                "бекон" -> 6.48
-                "тесто" -> 1.00
-                "томат" -> 1.53
-                "оливки" -> 1.53
-                "сыр" -> 0.98
-                "пармезан" -> 3.98
-                "грибы" -> 3.34
-                "спаржа" -> 3.34
-                "мясное ассорти" -> 9.38
-                "вяленая говядина" -> 12.24
-                else -> error("Неизвестный ингредиент")
+            pizzaPrice += ingredientPrice!!.price * ingredientCount
             }
-
-            pizzaPrice += price * ingredientCount
-        }
 
         return PizzaOrder(
             number = ++orderNumber,
@@ -62,7 +47,7 @@ class PizzaStore {
 
     fun executeOrder(pizzaOrder: PizzaOrder? = null, coffeeOrder: CoffeeOrder? = null) {
         if (pizzaOrder != null) {
-            pizzaMaker.makePizza(pizzaOrder.number, pizzaOrder.pizza, getIngredient(pizzaOrder.pizza))
+            pizzaMaker.makePizza(pizzaOrder.number, pizzaOrder.pizza, pizzaOrder.pizza.getIngredient())
         }
 
         if (coffeeOrder != null) {
